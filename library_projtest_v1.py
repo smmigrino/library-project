@@ -14,11 +14,49 @@ cur.execute("""CREATE TABLE IF NOT EXISTS
 
 conn.commit()
 
-print('Table successfully added.')
 
-print("\nHello, Welcome to LiShen's Library!") #HEADER
 
-#Create loop that lets users choose the action
+#----------------------HEADER------------------------------
+print("\nHello, Welcome to LiShen's Library!") 
+
+#---------------------Main Menu Functions-----------------
+
+def add_book():
+    print("\nAwesome! Let's add a book. Please enter the following details.")
+    title = input("Book title: ")
+    author = input("Author: ")
+    year = int(input("Publication year (Type 0 for unknown year): "))
+    
+    
+    cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
+    count = cur.fetchone()[0]
+    
+    if count == 0:
+        
+        cur.execute("""
+                INSERT INTO books(title, author, year) VALUES (?, ?, ?)""", (title, author, year))
+        print("\n\nBook successfully added.")
+        #print("\n\nBook successfully added with ID:", cur.lastrowid) #if you want to print the ID 
+        conn.commit()
+    else:
+        print("\nBook already in shelves. Exiting...")
+        
+
+def print_booklist():
+    cur.execute("SELECT * FROM books")
+    all_books = cur.fetchall()
+    
+    if all_books:
+        print("\n\nHere are all the books...\n")
+    
+        for book in all_books:
+            print(f"Book ID: {book[0]} | Title: {book[1]} | Author: {book[2]} | Publication Year: {book[3]}")
+    else:
+        print("\n\nShelves are empty! Add a book! Exiting now...")
+        
+
+
+    
 
 #cur.execute('DELETE FROM books')
 
