@@ -14,7 +14,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS
 
 conn.commit()
 
-#print('Table successfully added.')
+print('Table successfully added.')
 
 print("\nHello, Welcome to LiShen's Library!") #HEADER
 
