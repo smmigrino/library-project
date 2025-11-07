@@ -45,8 +45,8 @@ def display_menu(first_time=False):
 
 def add_book():
     print("\nAwesome! Let's add a book. Please enter the following details.")
-    title = input("Book title: ")
-    author = input("Author: ")
+    title = input("Book title: ") #convert to all caps to avoid duplicates
+    author = input("Author: ") #convert to all caps to avoid duplicates
     year = int(input("Publication year (Type 0 for unknown year): "))
     
     
