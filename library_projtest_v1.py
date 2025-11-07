@@ -104,14 +104,29 @@ def main_menu():
             view_booklist()
 
         elif choice == 3:
-            print('\n\nExiting... Good bye!')
-            time.sleep(1.5)
-            conn.close()
-            exit()    
-
+            print("Search function still in development hehehhe") 
+            
+        elif choice == 4:
+            print("Edit functions still in development hehehehe")
+            
+        elif choice == 5:
+            print("Delete functions still in development hehehehe")
+        
+        elif choice == 6:
+            print("Exiting the library...")
+            time.sleep(1)
+            print("3")
+            time.sleep(1)
+            print("2")
+            time.sleep(1)
+            print("1")
+            time.sleep(1)
+            print("Good bye!")
+            break
+    
         else:
             print("Invalid input. Try again..")
-            continue
+            
     conn.close()
 
 
