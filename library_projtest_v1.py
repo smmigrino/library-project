@@ -47,7 +47,7 @@ def add_book():
     print("\nAwesome! Let's add a book. Please enter the following details.")
     title = input("Book title: ") #convert to all caps to avoid duplicates
     author = input("Author: ") #convert to all caps to avoid duplicates
-    year = int(input("Publication year (Type 0 for unknown year): "))
+    year = int(input("Publication year (Type 0 for unknown year): ")) # add the error handling on this.
     
     
     cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
