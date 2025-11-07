@@ -1,5 +1,8 @@
+#THIS PROGRAM IS INTENDED FOR LIBRARY ADMIN, NOT A GUEST TO THE LIBRARY
+
 import sqlite3
 import time
+
 #connect database
 conn = sqlite3.connect('library.db')
 
@@ -15,9 +18,28 @@ cur.execute("""CREATE TABLE IF NOT EXISTS
 conn.commit()
 
 
-
 #----------------------HEADER------------------------------
 print("\nHello, Welcome to LiShen's Library!") 
+
+#--------------------Display Menu--------------------------
+
+def display_menu(first_time=False):
+    
+    options = (""""
+    1 - Add a book
+    2 - View book list
+    3 - Search a book
+    4 - Edit a book entry
+    5 - Delete a book
+    6 - Exit the library
+               """)
+    
+    if first_time:
+        print("\n\nWhat would you like to do? Enter the number for the following option.\n\n", options)
+    else:
+        print("\n\nSo.....What would you like to do next? Enter the number for the following option.\n\n", options)
+        
+
 
 #---------------------Main Menu Functions-----------------
 
@@ -42,7 +64,7 @@ def add_book():
         print("\nBook already in shelves. Exiting...")
         
 
-def print_booklist():
+def view_booklist():
     cur.execute("SELECT * FROM books")
     all_books = cur.fetchall()
     
@@ -173,4 +195,8 @@ while True: #I want to have "to do next" in the succeeding loop unless after exi
     #print(choice)
     
 conn.close()
+
+#-----Run Program--------
+#if __name__== "__main__":
+#    main_menu()
 
