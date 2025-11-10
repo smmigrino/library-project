@@ -27,7 +27,7 @@ def display_menu(first_time=False):
     
     options = ("""
     1 - Add a book
-    2 - View book list
+    2 - View all books
     3 - Search a book
     4 - Edit a book entry
     5 - Delete a book
@@ -105,7 +105,7 @@ def view_booklist():
 def search():
     while True:
         print("(Enter 'EXIT' to go back to Main Menu.)")
-        to_search = input("Enter Title/Author/Publication Year: ")
+        to_search = input("To Search, enter Title/Author/Publication Year: ")
         
         try:
             to_search = int(to_search)
