@@ -45,6 +45,7 @@ def display_menu(first_time=False):
 
 def add_book():
     print("\nAwesome! Let's add a book. Please enter the following details.")
+    
     #helper validators for duplicate handling and empty entries
     while True:
         title = input("Book title: ").strip().upper()
@@ -59,31 +60,21 @@ def add_book():
         print("Please enter author name.")
     
     while True:
-        
-        year = input("Publication year (Type 0 for unknown year): ").strip()
-        
-        if not year:
-            year = 0
+
+        try:
+            year = input("Publication year (Type 0 for unknown year): ").strip()    
+            year = int(year)
             break
         
-        else:
-            try:    
-                year = int(year)
-                break
-            
-            except ValueError:
-                print("Please enter valid year or 0 if year is unknown.")
-            
-    
-            
+        except ValueError:
+            print("Please enter valid year or 0 if year is unknown.")
+                    
 
-                
-        
-    
+    #duplicate handling portion    
     cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
     count = cur.fetchone()[0]
     
-    #duplicate handling portion
+
     if count == 0:
         
         cur.execute("""
