@@ -130,10 +130,10 @@ def view_booklist():
         
 
 def search():
-    print("-" *20, "SEARCH A BOOK", "-" *20)
+    print("-" *20 + "SEARCH A BOOK" + "-" *20)
     while True:
         print("(If you want to return to the Main Menu, type '#EXIT')") #you need to think this through and clean this up
-        to_search = input("To Search a book entry, enter Title/Author/Publication Year: ")
+        to_search = input("To Search a book entry, enter Title/Author/Publication Year: ").strip().upper()
         
         try:
             to_search = int(to_search) #to search by year
@@ -151,10 +151,9 @@ def search():
         
         except ValueError:
             if to_search == '#EXIT': #go back here and clean this up
-                print("Returning to main menu.")
-                break
+                print("Returning to main menu...")
+                return
             elif to_search != "":
-                to_search = to_search.upper()
                 cur.execute('SELECT * FROM books  WHERE title LIKE ? OR author LIKE ?', (f"%{to_search}%", f"%{to_search}%"))
                 book_list = cur.fetchall()
                 
@@ -169,7 +168,7 @@ def search():
                 print("Enter valid input. Try again.")
                 continue
 
-def edit_by_id():
+def edit_by_id(): #helper function
     while True:
         id_search = input("Enter ID: ").strip()
          
@@ -219,7 +218,7 @@ def edit_by_id():
             continue
 
 
-def edit_book():     
+def edit_book():  #helper function  
         
     while True:
         user_input = input("Do you know the ID? (y/n)").strip().lower()
@@ -265,7 +264,8 @@ def delete_book():
 
     
     while True:
-        print("----------DELETE MENU----------","""
+        print("-" *20 + "DELETE MENU" + "-" *20)
+        print("""
 Enter the number to choose the following:
     1 - Delete a book entry
     2 - Delete all book entries
@@ -317,9 +317,9 @@ Enter the number for the following:
                 confirm = input("Are you sure you want to delete all book entries? (y/n): ").lower()
                 if confirm == 'y':
                     cur.execute('DELETE FROM books')
-                    print("All book entries successfully deleted. Returning to Delete Menu.")
+                    print("All book entries successfully deleted. Returning to Main Menu.")
                     time.sleep(seconds_long)
-                    break
+                    return
                 elif confirm == 'n':#EDIT THIS 
                     print('hello')
                         
@@ -367,8 +367,10 @@ def main_menu():
             print("-" * 50)
             
         elif choice == 5: #DELETE BOOK(s)
-            cur.execute()
-            #print("Delete functions still in development hehehehe")
+            print("-" * 50)
+            delete_book()
+            print("-" * 50)
+
         
         elif choice == 6:
             print("Exiting the library...")
