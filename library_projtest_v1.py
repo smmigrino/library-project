@@ -47,57 +47,68 @@ def display_menu(first_time=False):
 
 #---------------------Main Menu Functions-----------------
 
+
+    
+
 def add_book():
     print("-" *20 + "ADD MENU" + "-" *20)
-    print("\nAwesome! Let's add a book. Please enter the following details.")
-    print("If you want to return to the Main Menu, type '#EXIT'.")
-    
-    #helper validators for duplicate handling and empty entries
     while True:
-        title = input("Book title: ").strip().upper()
-    
-        if title:
-            break
-        else:
-            print("Please enter title.")
+        print("\nAwesome! Let's add a book. Please enter the following details.")
         
-    while True:    
-        author = input("Author: ").strip().upper()
+        #helper validators for duplicate handling and empty entries
+        while True:
+            title = input("Book title: ").strip().upper()
         
-        if author:
-            break
-        
-        else:
-            print("Please enter author name.")
-    
-    while True:
-        year = input("Publication year (Type 0 for unknown year): ").strip().upper()
-         
-        if year:
-            try:
-                year = int(year)
+            if title:
+                break
+            else:
+                print("Please enter title.")
+            
+        while True:    
+            author = input("Author: ").strip().upper()
+            
+            if author:
                 break
             
-            except ValueError:
-                print("Please enter valid year or 0 if year is unknown.")
-        else:
-            print("Enter valid year or 0 if year is unknown.")
-                        
-
-    #duplicate handling portion
-    
-    cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
-    count = cur.fetchone()[0]
-
-    if count == 0:
+            else:
+                print("Please enter author name.")
         
-        cur.execute("""
-                INSERT INTO books(title, author, year) VALUES (?, ?, ?)""", (title, author, year))
-        print("\n\nBook successfully added.")
-        #print("\n\nBook successfully added with ID:", cur.lastrowid) #if you want to print the ID 
-        conn.commit()
-    else:
-        print("\nBook already in shelves. Try again.")
+        while True:
+            year = input("Publication year (Type 0 for unknown year): ").strip().upper()
+            
+            if year:
+                try:
+                    year = int(year)
+                    break
+                
+                except ValueError:
+                    print("Please enter valid year or 0 if year is unknown.")
+            else:
+                print("Enter valid year or 0 if year is unknown.")
+                            
+
+        #duplicate handling portion
+        
+        cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
+        count = cur.fetchone()[0]
+
+        if count == 0:
+            
+            cur.execute("""
+                    INSERT INTO books(title, author, year) VALUES (?, ?, ?)""", (title, author, year))
+            print("\n\nBook successfully added.")
+            #print("\n\nBook successfully added with ID:", cur.lastrowid) #if you want to print the ID 
+            conn.commit()
+            while True:    
+                choice = input("Would you like to add another book? (y/n): ").lower()
+                if choice == 'y':
+                    break
+                elif choice == 'n':
+                    return
+                else:
+                    print("Invalid input. Try again.")
+        else:
+            print("\nBook already in shelves. Try again.")
         
 
 def view_booklist():
@@ -132,6 +143,15 @@ def search():
                     id, title, author, year = book
                     print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
                     time.sleep(seconds_short)
+                while True:    
+                    choice = input("Would you like to search for another book? (y/n): ").lower()
+                    if choice == 'y':
+                        break
+                    elif choice == 'n':
+                        return
+                    else:
+                        print("Invalid input. Try again.")
+                    
             else:        
                 print("No match. Try again.")
             
@@ -145,6 +165,15 @@ def search():
                     for book in book_list:
                         id, title, author, year = book
                         print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
+                    while True:    
+                        choice = input("Would you like to search for another book? (y/n): ").lower()
+                        if choice == 'y':
+                            break
+                        elif choice == 'n':
+                            return
+                        else:
+                            print("Invalid input. Try again.")    
+                    
                 else:    
                     print("No match. Try again.")
                 continue
@@ -155,67 +184,97 @@ def search():
 def edit_by_id(): #helper function
     while True:
         id_search = input("Enter ID: ").strip()
-         
-        try:
-            id_search = int(id_search)
-            while True:
-                new_title = input("Book title: ").strip().upper()
-                if new_title:
-                    break
-                print("Please enter title.")
-                
-            while True:    
-                new_author = input("Author: ").strip().upper()
-                if new_author:
-                    break
-                print("Please enter author name.")
-            
-            while True:
-
+        cur.execute('SELECT * FROM books WHERE id = ?', (id_search,))
+        show_book = cur.fetchone()
+        id, title, author, year = show_book
+        print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication year: {year}")
+        
+        while True:
+            choice = input("Are you sure you want to edit this book entry? (y/n): ")   
+            if choice == 'y':
                 try:
-                    new_year = input("Publication year (Type 0 for unknown year): ").strip()    
-                    new_year = int(new_year)
-                    break
-                
-                except ValueError:
-                    print("Please enter valid year or 0 if year is unknown.")
-                            
-
-            #duplicate handling portion    
-            cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ? AND id != ?', (new_title, new_author, id_search))
-            count = cur.fetchone()[0]
-            
-
-            if count == 0:
-                
-                cur.execute("""
-                        UPDATE books SET title = ?, author = ?, year = ? WHERE id = ?""", (new_title, new_author, new_year, id_search))
-                print("\n\nBook successfully updated.")
-                conn.commit()
-                break
-            else:
-                print("\nBook already in shelves. Try again.")
+                    id_search = int(id_search)
+                    while True:
+                        new_title = input("Edit title: ").strip().upper()
+                        if new_title:
+                            break
+                        else:
+                            print("Please enter title.")
                         
-                       
-        except ValueError:
-            print("Enter valid ID number. Try again.")
-            continue
+                    while True:    
+                        new_author = input("Edit Author: ").strip().upper()
+                        if new_author:
+                            break
+                        else:
+                            print("Please enter author name.")
+                    
+                    while True:
+                        new_year = input("Edit publication year (Type 0 for unknown year): ").strip() 
+                        try:   
+                            new_year = int(new_year)
+                            break           
+                        except ValueError:
+                            print("Please enter valid year or 0 if year is unknown.")
+                                    
+
+                    #duplicate handling portion    
+                    cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ? AND id != ?', (new_title, new_author, id_search))
+                    count = cur.fetchone()[0]
+                    
+
+                    if count == 0:
+                        cur.execute("""
+                            UPDATE books SET title = ?, author = ?, year = ? WHERE id = ?""", (new_title, new_author, new_year, id_search))
+                        print("\n\nBook successfully updated.")
+                        conn.commit()
+                        return
+
+                    else:
+                        print("\nBook already in shelves. Try again.")
+                                
+                            
+                except ValueError:
+                    print("Enter valid ID number. Try again.")
+                    continue
+                
+                
+            elif choice =='n':
+                return
+            
+            else:
+                print("Invalid input. Try again")
+         
+        
 
 
 def edit_book():  #helper function  
         
     while True:
-        user_input = input("Do you know the ID? (y/n)").strip().lower()
+        user_input = input("Do you know the ID? (y/n): ").strip().lower()
         
         if user_input == 'n':
             search()
             edit_by_id()
-            break
+            while True:    
+                choice = input("Would you like to updated another book? (y/n): ").lower()
+                if choice == 'y':
+                    break
+                elif choice == 'n':
+                    return
+                else:
+                    print("Invalid input. Try again.")
 
             
         elif user_input == 'y':
             edit_by_id()
-            break
+            while True:    
+                choice = input("Would you like to updated another book? (y/n): ").lower()
+                if choice == 'y':
+                    break
+                elif choice == 'n':
+                    return
+                else:
+                    print("Invalid input. Try again.")
             
         else:
             print("Enter 'y' for yes, or 'n'  for no. Try again.")    
@@ -319,7 +378,8 @@ Enter the number for the following:
                                                     
                                 elif choice == 3:
                                     break
-                                break
+                                continue
+                            
                             except ValueError:
                                 print("Invalid entry. Enter number of your choice. Try again.")                        
                       
