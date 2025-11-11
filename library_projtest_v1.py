@@ -34,7 +34,7 @@ def display_menu(first_time=False):
     2 - View all books
     3 - Search a book
     4 - Edit a book entry
-    5 - Delete a book
+    5 - Delete book(s)
     6 - Exit the library
                """)
     
@@ -55,12 +55,8 @@ def add_book():
     #helper validators for duplicate handling and empty entries
     while True:
         title = input("Book title: ").strip().upper()
-        
-        if title == '#EXIT':
-            print("Returning to Main Menu...")
-            return
-        
-        elif title:
+    
+        if title:
             break
         else:
             print("Please enter title.")
@@ -68,11 +64,7 @@ def add_book():
     while True:    
         author = input("Author: ").strip().upper()
         
-        if author == '#EXIT':
-            print("Returning to Main Menu...")
-            return
-        
-        elif author:
+        if author:
             break
         
         else:
@@ -81,11 +73,7 @@ def add_book():
     while True:
         year = input("Publication year (Type 0 for unknown year): ").strip().upper()
          
-        if year == '#EXIT':
-            print("Returning to Main Menu...")
-            return
-     
-        elif year:
+        if year:
             try:
                 year = int(year)
                 break
@@ -132,7 +120,6 @@ def view_booklist():
 def search():
     print("-" *20 + "SEARCH A BOOK" + "-" *20)
     while True:
-        print("(If you want to return to the Main Menu, type '#EXIT')") #you need to think this through and clean this up
         to_search = input("To Search a book entry, enter Title/Author/Publication Year: ").strip().upper()
         
         try:
@@ -150,10 +137,7 @@ def search():
             
         
         except ValueError:
-            if to_search == '#EXIT': #go back here and clean this up
-                print("Returning to main menu...")
-                return
-            elif to_search != "":
+            if to_search != "":
                 cur.execute('SELECT * FROM books  WHERE title LIKE ? OR author LIKE ?', (f"%{to_search}%", f"%{to_search}%"))
                 book_list = cur.fetchall()
                 
@@ -353,11 +337,15 @@ Enter the number for the following:
                 elif confirm == 'n':#EDIT THIS 
                     print('Alright, returning to DELETE MENU')
                     continue
+                
                     
                     
             elif choice == 3:
                 print("Returning to Main Menu...")
                 return
+            
+            else:
+                print("Invalid entry. Try again.")                
                         
             
         except ValueError:
