@@ -237,19 +237,30 @@ def edit_book():  #helper function
             print("Enter 'y' for yes, or 'n'  for no. Try again.")    
 
 def delete_by_id():
-    book_id = input("Enter book ID: ")
-    cur.execute('SELECT * FROM books WHERE id = ?', (book_id,))
-    show_book = cur.fetchall()
+    while True:
+        book_id = input("Enter book ID: ")
+        
+        try:
+            book_id = int(book_id)
+            
+            cur.execute('SELECT * FROM books WHERE id = ?', (book_id,))
+            show_book = cur.fetchone()
+            id, title, author, year = show_book
+            print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
+            break
+            
+        except ValueError:
+            print("Enter valid ID. Try again.")
 
-    id, title, author, year = show_book
-    print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
+    
 
     while True:    
         confirm = input("\nAre you sure you want to delete this book entry? (y/n): ").lower()
 
         if confirm == 'y':
             cur.execute('DELETE FROM books WHERE id = ?', (book_id,))
-            print("Book entry successfully deleted. Returning to Delete Menu.")
+            conn.commit()
+            print("Book entry successfully deleted.")
             break
         
         elif confirm == 'n':
@@ -261,8 +272,6 @@ def delete_by_id():
     
 
 def delete_book():
-
-    
     while True:
         print("-" *20 + "DELETE MENU" + "-" *20)
         print("""
@@ -283,25 +292,45 @@ Enter the number to choose the following:
                     
                     if confirm == 'y':
                         delete_by_id()
-                        break                    
+                        choice = input("Do you want to delete another book entry: (y/n):").strip().lower()
+                        if choice == 'y':
+                            break
+                        elif choice == 'n':
+                            print("Returning to Delete Menu...")
+                            break
+                        break
+                                            
                         
                     elif confirm == 'n':
                         while True:
-                            choice = input("""
+                            print("""
 Enter the number for the following:
     1 - Search a book
     2 - Show all book list
     3 - Return to Delete Menu""")
+                            choice = input("Enter number: ")
                             try:
                                 choice = int(choice)
                                 if choice == 1:
                                     search()
-                                    delete_by_id
-                                    break
-                                                                
+                                    delete_by_id()
+                                    choice = input("Do you want to delete another book entry: (y/n):").strip().lower()
+                                    if choice == 'y':
+                                        break
+                                    elif choice == 'n':
+                                        print("Returning to Delete Menu...")
+                                        break
+                                    break                                    
+                                   
                                 elif choice == 2:
                                     view_booklist()
                                     delete_by_id()
+                                    choice = input("Do you want to delete another book entry: (y/n):").strip().lower()
+                                    if choice == 'y':
+                                        break
+                                    elif choice == 'n':
+                                        print("Returning to Delete Menu...")
+                                        break
                                     break
                                                     
                                 elif choice == 3:
@@ -313,15 +342,22 @@ Enter the number for the following:
                     else:
                         print("Enter 'y' for yes, and 'n' for no. Try again.")
             
-            if choice == 2:
+            elif choice == 2:
                 confirm = input("Are you sure you want to delete all book entries? (y/n): ").lower()
                 if confirm == 'y':
                     cur.execute('DELETE FROM books')
+                    conn.commit()
                     print("All book entries successfully deleted. Returning to Main Menu.")
                     time.sleep(seconds_long)
                     return
                 elif confirm == 'n':#EDIT THIS 
-                    print('hello')
+                    print('Alright, returning to DELETE MENU')
+                    continue
+                    
+                    
+            elif choice == 3:
+                print("Returning to Main Menu...")
+                return
                         
             
         except ValueError:
