@@ -29,7 +29,7 @@ print("\nHello, Welcome to LiShen's Library!")
 #----------------------CONSTANTS---------------------------
 
 invalid_yes_no = "Invalid input. Enter 'y' for YES and 'n' for NO. Try again."
-invalid_num_choice = "Invalid input. Enter the of your choice."
+invalid_num_choice = "Invalid input. Enter the number of your choice."
 #--------------------Display Menu--------------------------
 
 def display_menu(first_time=False):
@@ -135,17 +135,37 @@ def view_booklist():
     
     if all_books:
         print("\n\nHere are all the books...\n")
-        time.sleep(3)
+        time.sleep(seconds_long)
     
         for book in all_books:
             id, title, author, year = book
             print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
             time.sleep(seconds_short)
-        return
+        while True:
+            print("""\nWhat would you like to do next?\n
+        1 - Add Book
+        2 - Return to Main Menu""")
+            choice = input("\nEnter the number of your choice: ").strip()
+            if choice == '1':
+                add_book()
+            elif choice == '2':
+                return
+            else:
+                print(f"\n{invalid_num_choice}")
     else:
         print("\n\nShelves are empty! Add a book!")
-        time.sleep(seconds_long)        
-        return
+        while True:
+            print("""What would you like to do next?\n
+1 - Add Book
+2 - Return to Main Menu""")
+            choice = input("\nEnter the number of your choice: ").strip()
+            if choice == '1':
+                add_book()
+            elif choice == '2':
+                return
+            else:
+                print("\n", invalid_num_choice)
+
         
 
 def search():
