@@ -58,7 +58,7 @@ def confirm_repeat(action):
         choice = input(f"Would you like to {action}? (y/n): ").lower()
         
         if choice == 'y':
-            return
+            return 'repeat'
         
         elif choice == 'n':
             return 'stop'
@@ -119,8 +119,11 @@ def add_book():
             sub_choice = confirm_repeat('add another book')
             if sub_choice == 'stop':
                 return
+            elif sub_choice == 'repeat':
+                continue
             else:
-                break
+                print("Error occured. Returning to Main Menu.")
+                return
         else:
             print("\nBook already in shelves. Try again.")
         
@@ -135,12 +138,13 @@ def view_booklist():
         time.sleep(3)
     
         for book in all_books:
-            print(f"Book ID: {book[0]} | Title: {book[1]} | Author: {book[2]} | Publication Year: {book[3]}")
+            id, title, author, year = book
+            print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
             time.sleep(seconds_short)
         return
     else:
         print("\n\nShelves are empty! Add a book!")
-        time.sleep(seconds_long)
+        time.sleep(seconds_long)        
         return
         
 
