@@ -175,8 +175,9 @@ def search():
     while True:
         to_search = input("To Search a book entry, enter Title/Author/Publication Year: ").strip().upper()
         
+        #to search by year
         try:
-            to_search = int(to_search) #to search by year
+            to_search = int(to_search) 
             cur.execute("SELECT * FROM books WHERE year = ?", (to_search,))
             book_list = cur.fetchall() #CHECK IF THIS WONT BREAK IF THERE IS ONLY ONE ENTRY FOUND
             
