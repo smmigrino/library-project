@@ -31,6 +31,7 @@ print("\nHello, Welcome to LiShen's Library!")
 invalid_yes_no = "Invalid input. Enter 'y' for YES and 'n' for NO. Try again."
 invalid_num_choice = "Invalid input. Enter the number of your choice."
 error_return_main = "Error occurred. Returning to Main Menu."
+invalid_id = "Invalid input. Enter valid ID number. Try again."
 #--------------------Display Menu--------------------------
 
 def display_menu(first_time=False):
@@ -229,23 +230,29 @@ def edit_by_id():
     """HELPER FUNC FOR EDIT MENU: EDITING ENTRIES BY ID"""
     while True:
         id_search = input("Enter ID: ").strip()
-        cur.execute('SELECT * FROM books WHERE id = ?', (id_search,))
-        show_book = cur.fetchone()
-        id, title, author, year = show_book
-        print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication year: {year}")
+        try:
+            id_search = int(id_search)
+            cur.execute('SELECT * FROM books WHERE id = ?', (id_search,))
+            show_book = cur.fetchone()
+            if show_book is None:
+                print("ID not found. Try again.")
+                continue
+            id, title, author, year = show_book
         
-        while True:
-            choice = input("Are you sure you want to edit this book entry? (y/n): ")   
-            if choice == 'y':
-                try:
-                    id_search = int(id_search)
+            #display entry for user verification
+            print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication year: {year}")
+            
+            while True:
+                choice = input("Are you sure you want to edit this book entry? (y/n): ").strip().lower() 
+                if choice == 'y':
+
                     while True:
                         new_title = input("Edit title: ").strip().upper()
                         if new_title:
                             break
                         else:
                             print("Please enter title.")
-                        
+                                                    
                     while True:    
                         new_author = input("Edit Author: ").strip().upper()
                         if new_author:
@@ -262,7 +269,7 @@ def edit_by_id():
                             print("Please enter valid year or 0 if year is unknown.")
                                     
 
-                    #duplicate handling portion    
+                    #checking whether the new entry doesnt exist already    
                     cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ? AND id != ?', (new_title, new_author, id_search))
                     count = cur.fetchone()[0]
                     
@@ -272,22 +279,24 @@ def edit_by_id():
                             UPDATE books SET title = ?, author = ?, year = ? WHERE id = ?""", (new_title, new_author, new_year, id_search))
                         print("\n\nBook successfully updated.")
                         conn.commit()
-                        return
-
+                        return #main edit menu
+                        
                     else:
                         print("\nBook already in shelves. Try again.")
-                                
-                            
-                except ValueError:
-                    print("Enter valid ID number. Try again.")
-                    continue
+                    
+                    
+                elif choice =='n':
+                    return
                 
-                
-            elif choice =='n':
-                return
-            
-            else:
-                print(invalid_yes_no)
+                else:
+                    print(invalid_yes_no)
+
+        except ValueError:
+            print(invalid_id)
+        
+        
+        
+        
          
         
 
