@@ -30,6 +30,7 @@ print("\nHello, Welcome to LiShen's Library!")
 
 invalid_yes_no = "Invalid input. Enter 'y' for YES and 'n' for NO. Try again."
 invalid_num_choice = "Invalid input. Enter the number of your choice."
+error_return_main = "Error occurred. Returning to Main Menu."
 #--------------------Display Menu--------------------------
 
 def display_menu(first_time=False):
@@ -122,7 +123,7 @@ def add_book():
             elif sub_choice == 'repeat':
                 continue
             else:
-                print("Error occured. Returning to Main Menu.")
+                print(error_return_main)
                 return
         else:
             print("\nBook already in shelves. Try again.")
@@ -179,7 +180,7 @@ def search():
         try:
             to_search = int(to_search) 
             cur.execute("SELECT * FROM books WHERE year = ?", (to_search,))
-            book_list = cur.fetchall() #CHECK IF THIS WONT BREAK IF THERE IS ONLY ONE ENTRY FOUND
+            book_list = cur.fetchall() 
             
             if book_list:
                 for book in book_list:
@@ -189,19 +190,21 @@ def search():
                     sub_choice = confirm_repeat('search another book')
                     if sub_choice == 'stop':
                         return
+                    elif sub_choice == 'repeat':
+                        continue
                     else:
-                        break #check if this returns to the outer while loop or should continue be used
+                        print(error_return_main)
+                        return
 
-                    
             else:        
                 print("No match. Try again.")
-                continue #check if this is necessary 
+                continue
             
         
         except ValueError:
             if to_search != "":
                 cur.execute('SELECT * FROM books  WHERE title LIKE ? OR author LIKE ?', (f"%{to_search}%", f"%{to_search}%"))
-                book_list = cur.fetchall()#CHECK IF THIS WONT BREAK IF THERE IS ONLY ONE ENTRY FOUND
+                book_list = cur.fetchall()
                 
                 if book_list:
                     for book in book_list:
@@ -210,14 +213,17 @@ def search():
                     sub_choice = confirm_repeat('search another book')
                     if sub_choice == 'stop':
                         return
+                    elif sub_choice == 'repeat':
+                        continue
                     else:
-                        break #check if this returns to the outer while loop or should continue be used               
+                        print(error_return_main)
+                        return                
                 else:    
                     print("No match. Try again.")
-                continue #check if this is necessary
+                    continue
             else:
                 print("Enter valid input. Try again.")
-                continue #check if this is necessary
+                continue
 
 def edit_by_id():
     """HELPER FUNC FOR EDIT MENU: EDITING ENTRIES BY ID"""
