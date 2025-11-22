@@ -147,21 +147,18 @@ def view_booklist():
         choice = prompt_add_or_menu()
         if choice == 'return':
             return
-                
-    print("\n\nHere are all the books...\n")
-    time.sleep(seconds_long)
+    else:            
+        print("\n\nHere are all the books...\n")
+        time.sleep(seconds_long)
 
-    for book in all_books:
-        id, title, author, year = book
-        print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
-        time.sleep(seconds_short)
-    choice = prompt_add_or_menu()
-    if choice == 'return':
-        return
+        for book in all_books:
+            id, title, author, year = book
+            print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
+            time.sleep(seconds_short)
+        choice = prompt_add_or_menu()
+        if choice == 'return':
+            return
 
-
-    
-    
 
 def search():
     """SEARCH FUNCTION WHERE USER CAN SEARCH BOOK ENTRIES"""
@@ -184,14 +181,14 @@ def search():
                 id, title, author, year = book
                 print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
                 time.sleep(seconds_short)
-                sub_choice = confirm_repeat('search another book')
-                if sub_choice == 'stop':
-                    return
-                elif sub_choice == 'repeat':
-                    continue
-                else:
-                    print(error_return_main)
-                    return
+            sub_choice = confirm_repeat('search another book')
+            if sub_choice == 'stop':
+                return
+            elif sub_choice == 'repeat':
+                continue
+            else:
+                print(error_return_main)
+                return
 
         except ValueError:
             if to_search == "":
@@ -217,11 +214,9 @@ def search():
                 print(error_return_main)
                 return              
 
-
-
 def edit_by_id():
     """HELPER FUNC FOR EDIT MENU: EDITING ENTRIES BY ID"""
-    while True:
+    while True: 
         id_search = input("Enter ID: ").strip()
         try:
             id_search = int(id_search)
@@ -238,20 +233,17 @@ def edit_by_id():
             while True:
                 choice = input("Are you sure you want to edit this book entry? (y/n): ").strip().lower() 
                 if choice == 'y':
-
                     while True:
                         new_title = input("Edit title: ").strip().upper()
                         if new_title:
                             break
-                        else:
-                            print("Please enter title.")
+                        print("Please enter title.")
                                                     
                     while True:    
                         new_author = input("Edit Author: ").strip().upper()
                         if new_author:
                             break
-                        else:
-                            print("Please enter author name.")
+                        print("Please enter author name.")
                     
                     while True:
                         new_year = input("Edit publication year (Type 0 for unknown year): ").strip() 
@@ -259,100 +251,86 @@ def edit_by_id():
                             new_year = int(new_year)
                             break           
                         except ValueError:
-                            print("Please enter valid year or 0 if year is unknown.")
-                                    
-
-                    #checking whether the new entry doesnt exist already    
+                            print(invalid_year)
+            
+                    #to check whether the new entry doesnt exist already    
                     cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ? AND id != ?', (new_title, new_author, id_search))
                     count = cur.fetchone()[0]
                     
-
                     if count == 0:
                         cur.execute("""
                             UPDATE books SET title = ?, author = ?, year = ? WHERE id = ?""", (new_title, new_author, new_year, id_search))
                         print("\n\nBook successfully updated.")
                         conn.commit()
-                        return #main edit menu
+                        return #return to main edit menu
                         
                     else:
                         print("\nBook already in shelves. Try again.")
                     
                     
                 elif choice =='n':
-                    return
+                    return #return to main edit menu
                 
                 else:
                     print(invalid_yes_no)
 
         except ValueError:
             print(invalid_id)
-        
-        
-        
-        
-         
-        
-
+           
 
 def edit_book():
     """FUNCTION CONTROLLER: EDIT BOOK ENTRIES""" 
-        
+    print("-" *20 + "EDIT MENU" + "-" *20)
     while True:
         user_input = input("Do you know the ID? (y/n): ").strip().lower()
         
         if user_input == 'n':
             search()
+            print("-" *20 + "EDIT BOOK ENTRY" + "-" *20)
             edit_by_id()
             sub_choice = confirm_repeat('edit another book')
             if sub_choice == 'stop':
                 return
             else:
                 continue
-                
-            
+       
         elif user_input == 'y':
             edit_by_id()
             sub_choice = confirm_repeat('edit another book')
             if sub_choice == 'stop':
                 return
             else:
-                continue
-            
+                continue          
         else:
             print(invalid_yes_no)    
 
 
 def delete_by_id():
     while True:
-        book_id = input("Enter book ID: ")
-        
+        book_id = input("Enter book ID: ")      
         try:
             book_id = int(book_id)
-            
             cur.execute('SELECT * FROM books WHERE id = ?', (book_id,))
             show_book = cur.fetchone()
+            if show_book is None:
+                print(no_match)
+                continue
             id, title, author, year = show_book
             print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
-            break
-            
+            break       
         except ValueError:
             print("Enter valid ID. Try again.")
 
-    
-
     while True:    
-        delete = input("\nAre you sure you want to delete this book entry? (y/n): ").lower()
-
+        delete = input("\nAre you sure you want to delete this book entry? (y/n): ").strip().lower()
         if delete == 'y':
             cur.execute('DELETE FROM books WHERE id = ?', (book_id,))
             conn.commit()
             print("Book entry successfully deleted.")
-            return
-        
+            return    
         elif delete == 'n':
             print("Returning to DELETE MENU.")
-            return
-        
+            return    
         else:
             print(invalid_yes_no)
 
@@ -367,31 +345,25 @@ Enter the number for the following:
         try:
             choice = int(choice)
             if choice == 1:
+                print("-" *20 + "SEARCH MODE IN DELETE MENU" + "-" *20)
                 search()
+                print("-" *20 + "DELETE BOOK ENTRY" + "-" *20)
                 delete_by_id()
                 return
-                          
-                
             elif choice == 2:
                 view_booklist()
+                print("-" *20 + "VIEW BOOKLIST MODE IN DELETE MENU" + "-" *20)
+                print("-" *20 + "DELETE BOOK ENTRY" + "-" *20)
                 delete_by_id()
-                return
-
-                                
+                return                  
             elif choice == 3:
                 return 'back'
-            
             else:
                 print(invalid_num_choice)
-            
-            
-        
-        
-        except ValueError:
-            print("Invalid entry. Enter number of your choice. Try again.")     
-    
 
-        
+        except ValueError:
+            print(invalid_num_choice)     
+   
 
 def delete_book():
     """CONTROLLER FUNCTION FOR DELETE"""
@@ -403,39 +375,35 @@ Enter the number to choose the following:
     2 - Delete all book entries
     3 - Return to main menu""")
         
-        choice = input("Enter number: ")
-        
+        choice = input("Enter number: ")  
         try:
-            choice = int(choice)
-                        
+            choice = int(choice)                  
             if choice == 1:
                 while True:
-                    know_id = input("Do you know the ID number? (y/n): ").strip().lower()
-                    
+                    know_id = input("Do you know the ID number? (y/n): ").strip().lower()    
                     if know_id == 'y':
                         delete_by_id()
                         sub_choice = confirm_repeat('delete another book')
                         if sub_choice == 'stop':
                             return
-                        else:
-                            break    
+  
                     elif know_id == 'n':                        
                         sub_choice1 = del_no_id_menu()
                         if sub_choice1 == 'back':
                             print('Returning to DELETE MENU')
-                            break
+                            continue
                         sub_choice2 = confirm_repeat('delete another book entry')
                         if sub_choice2 == 'stop':
                             print('Returning to MAIN MENU')
                             return
                         else:
                             print('Returning to DELETE MENU')
-                            break                
+                            continue                
                     else:
                         print(invalid_yes_no)
  
             elif choice == 2:
-                confirm = input("Are you sure you want to delete all book entries? (y/n): ").lower()
+                confirm = input("Are you sure you want to delete all book entries? (y/n): ").strip().lower()
                 if confirm == 'y':
                     cur.execute('DELETE FROM books')
                     conn.commit()
@@ -454,9 +422,6 @@ Enter the number to choose the following:
         except ValueError:
             print(invalid_num_choice)
             
-            
-    
-
     
 #--------Main Menu block--------
 def main_menu():
@@ -513,10 +478,9 @@ def main_menu():
             break
     
         else:
-            print("Invalid input. Try again..")
+            print(invalid_basic)
             
     conn.close()
-
 
 
 #-----Run Program--------
