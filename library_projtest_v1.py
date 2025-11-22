@@ -32,6 +32,9 @@ invalid_yes_no = "Invalid input. Enter 'y' for YES and 'n' for NO. Try again."
 invalid_num_choice = "Invalid input. Enter the number of your choice."
 error_return_main = "Error occurred. Returning to Main Menu."
 invalid_id = "Invalid input. Enter valid ID number. Try again."
+invalid_basic = "Enter valid input. Try again."
+no_match = "No match. Try again."
+invalid_year = "Enter valid year or 0 if year is unknown."
 #--------------------Display Menu--------------------------
 
 def display_menu(first_time=False):
@@ -53,6 +56,8 @@ def display_menu(first_time=False):
 
 
 #---------------------Main Menu Functions-----------------
+
+
 
 def confirm_repeat(action):
     """HELPER FUNC: ASK USER IF THEY WANT TO REPEAT THE ACTION"""
@@ -77,42 +82,32 @@ def add_book():
         #helper validators for duplicate handling and empty entries
         while True:
             title = input("Book title: ").strip().upper()
-        
             if title:
                 break
-            else:
-                print("Please enter title.")
+            print("Please enter title.")
             
         while True:    
-            author = input("Author: ").strip().upper()
-            
+            author = input("Author: ").strip().upper()   
             if author:
                 break
-            
-            else:
-                print("Please enter author name.")
+            print("Please enter author name.")
         
         while True:
             year = input("Publication year (Type 0 for unknown year): ").strip().upper()
-            
-            if year:
-                try:
-                    year = int(year)
-                    break
-                
-                except ValueError:
-                    print("Please enter valid year or 0 if year is unknown.")
-            else:
-                print("Enter valid year or 0 if year is unknown.")
-                            
+            if not year:
+                print(invalid_year)
+                continue                     
+            try:
+                year = int(year)
+                break           
+            except ValueError:
+                print(invalid_year)
 
-        #duplicate handling portion
-        
+        #duplicate handling portion      
         cur.execute('SELECT COUNT(*) FROM  books WHERE title = ? AND author = ?', (title, author))
         count = cur.fetchone()[0]
-
-        if count == 0:
             
+        if count == 0:    
             cur.execute("""
                     INSERT INTO books(title, author, year) VALUES (?, ?, ?)""", (title, author, year))
             print("\n\nBook successfully added.")
@@ -129,46 +124,44 @@ def add_book():
         else:
             print("\nBook already in shelves. Try again.")
         
+def prompt_add_or_menu():
+    while True:
+        print("""\nWhat would you like to do next?\n
+    1 - Add Book
+    2 - Return to Main Menu""")
+        choice = input("\nEnter the number of your choice: ").strip()
+        if choice == '1':
+            add_book()
+        elif choice == '2':
+            return 'return'
+        else:
+            print(f"\n{invalid_num_choice}")
 
 def view_booklist():
     print("-" *20, "ALL BOOK ENTRIES", "-" *20)
     cur.execute("SELECT * FROM books")
     all_books = cur.fetchall()
     
-    if all_books:
-        print("\n\nHere are all the books...\n")
-        time.sleep(seconds_long)
-    
-        for book in all_books:
-            id, title, author, year = book
-            print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
-            time.sleep(seconds_short)
-        while True:
-            print("""\nWhat would you like to do next?\n
-        1 - Add Book
-        2 - Return to Main Menu""")
-            choice = input("\nEnter the number of your choice: ").strip()
-            if choice == '1':
-                add_book()
-            elif choice == '2':
-                return
-            else:
-                print(f"\n{invalid_num_choice}")
-    else:
+    if not all_books:
         print("\n\nShelves are empty! Add a book!")
-        while True:
-            print("""What would you like to do next?\n
-1 - Add Book
-2 - Return to Main Menu""")
-            choice = input("\nEnter the number of your choice: ").strip()
-            if choice == '1':
-                add_book()
-            elif choice == '2':
-                return
-            else:
-                print("\n", invalid_num_choice)
+        choice = prompt_add_or_menu()
+        if choice == 'return':
+            return
+                
+    print("\n\nHere are all the books...\n")
+    time.sleep(seconds_long)
 
-        
+    for book in all_books:
+        id, title, author, year = book
+        print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year}")
+        time.sleep(seconds_short)
+    choice = prompt_add_or_menu()
+    if choice == 'return':
+        return
+
+
+    
+    
 
 def search():
     """SEARCH FUNCTION WHERE USER CAN SEARCH BOOK ENTRIES"""
@@ -183,48 +176,48 @@ def search():
             cur.execute("SELECT * FROM books WHERE year = ?", (to_search,))
             book_list = cur.fetchall() 
             
-            if book_list:
-                for book in book_list:
-                    id, title, author, year = book
-                    print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
-                    time.sleep(seconds_short)
-                    sub_choice = confirm_repeat('search another book')
-                    if sub_choice == 'stop':
-                        return
-                    elif sub_choice == 'repeat':
-                        continue
-                    else:
-                        print(error_return_main)
-                        return
+            if not book_list:
+                print(no_match)
+                continue
+                
+            for book in book_list:
+                id, title, author, year = book
+                print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
+                time.sleep(seconds_short)
+                sub_choice = confirm_repeat('search another book')
+                if sub_choice == 'stop':
+                    return
+                elif sub_choice == 'repeat':
+                    continue
+                else:
+                    print(error_return_main)
+                    return
 
-            else:        
-                print("No match. Try again.")
+        except ValueError:
+            if to_search == "":
+                print(invalid_basic)
                 continue
             
-        
-        except ValueError:
-            if to_search != "":
-                cur.execute('SELECT * FROM books  WHERE title LIKE ? OR author LIKE ?', (f"%{to_search}%", f"%{to_search}%"))
-                book_list = cur.fetchall()
-                
-                if book_list:
-                    for book in book_list:
-                        id, title, author, year = book
-                        print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
-                    sub_choice = confirm_repeat('search another book')
-                    if sub_choice == 'stop':
-                        return
-                    elif sub_choice == 'repeat':
-                        continue
-                    else:
-                        print(error_return_main)
-                        return                
-                else:    
-                    print("No match. Try again.")
-                    continue
-            else:
-                print("Enter valid input. Try again.")
+            cur.execute('SELECT * FROM books  WHERE title LIKE ? OR author LIKE ?', (f"%{to_search}%", f"%{to_search}%"))
+            book_list = cur.fetchall()
+            
+            if not book_list:
+                print(no_match)
                 continue
+                
+            for book in book_list:
+                id, title, author, year = book
+                print(f"Book ID: {id} | Title: {title} | Author: {author} | Publication Year: {year} ")
+            sub_choice = confirm_repeat('search another book')
+            if sub_choice == 'stop':
+                return
+            elif sub_choice == 'repeat':
+                continue
+            else:
+                print(error_return_main)
+                return              
+
+
 
 def edit_by_id():
     """HELPER FUNC FOR EDIT MENU: EDITING ENTRIES BY ID"""
